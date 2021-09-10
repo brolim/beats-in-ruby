@@ -1,5 +1,5 @@
 class Beats
-  SEMITONES_BY_LETTER = {
+  SEMITONE_BY_LETTER = {
     'A'  =>  0,
     'A#' =>  1,
     'B'  =>  2,
@@ -12,6 +12,13 @@ class Beats
     'F#' =>  9,
     'G'  => 10,
     'G#' => 11
+  }
+
+  LETTER_BY_SEMITONE = SEMITONE_BY_LETTER.invert
+
+  SCALES = {
+    major: [0, 2, 4, 5, 7, 9, 11, 12],
+    minor: [0, 2, 3, 5, 7, 8, 10, 12]
   }
 
   MUSICS = {
@@ -27,9 +34,23 @@ class Beats
 
   SAMPLE_RATE = 48000
 
-  def play music_key_or_encoded_notes
+  def scale letter, scale_key
+    return if !SEMITONE_BY_LETTER[letter] || !SCALES[scale_key]
+
+    initial_semitone = SEMITONE_BY_LETTER[letter]
+    semitones = SCALES[scale_key].map { |scale_semitone| initial_semitone + scale_semitone }
+    semitones.map do |semitone|
+      octave = (semitone.to_f / 12).to_i
+      letter =  LETTER_BY_SEMITONE[semitone % 12]
+      "#{letter}.#{octave}"
+    end
+  end
+
+  def play key_or_encoded_notes, scale_key = nil
     print 'generating music wave file... '
-    encoded_notes = MUSICS[music_key_or_encoded_notes] || music_key_or_encoded_notes
+    encoded_notes = MUSICS[key_or_encoded_notes] || scale(key_or_encoded_notes, scale_key) || key_or_encoded_notes
+    puts 'encoded_notes'
+    puts encoded_notes
     generate_wave_file(encoded_notes: encoded_notes)
     puts 'OK'
     system 'ffplay -showmode 1 -f f32le -ar 48000 output.bin'
@@ -39,7 +60,7 @@ class Beats
     binary_wave = encoded_notes.map do |encoded_note|
       generate_binary_sound(
         encoded_note: encoded_note,
-        duration: 0.3,
+        duration: 0.8,
         volume: volume
       )
     end
@@ -69,7 +90,7 @@ class Beats
 
   def frequency_for_note encoded_note
     letter, octave = encoded_note.split('.')
-    semitone_number = SEMITONES_BY_LETTER[letter] + 12 * octave.to_i
+    semitone_number = SEMITONE_BY_LETTER[letter] + 12 * octave.to_i
     440 * (2 ** (1.0 / 12.0)) ** semitone_number
   end
 
