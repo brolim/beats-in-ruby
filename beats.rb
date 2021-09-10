@@ -86,7 +86,3 @@ class Beats
     [1.0, release_step * (n_samples - i)].min
   end
 end
-
-beats = Beats.new
-beats.play(:brilha_brilha_estrelinha)
-# beats.play(%w[C.0 C.0 C.0 C.0])
