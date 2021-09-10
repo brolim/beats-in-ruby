@@ -14,40 +14,20 @@ class Beats
     'G#' => 11
   }
 
-  def generate_sound encoded_note:, duration:, sample_rate: 48000, volume: 1
-    samples_to_generate = (duration * sample_rate).to_i
+  MUSICS = {
+    brilha_brilha_estrelinha: %w[
+      C.0 C.0 G.0 G.0 A.1 A.1 G.0 _
+      F.0 F.0 E.0 E.0 D.0 D.0 C.0 _
+      G.0 G.0 F.0 F.0 E.0 E.0 D.0 _
+      G.0 G.0 F.0 F.0 E.0 E.0 D.0 _
+      C.0 C.0 G.0 G.0 A.1 A.1 G.0 _
+      F.0 F.0 E.0 E.0 D.0 D.0 C.0 _
+    ]
+  }
 
-    if (encoded_note == '_')
-      puts '---'
-      return samples_to_generate.times.map { |_| 0 }
-    end
-
-    puts encoded_note
-
-    semitone_number = SEMITONES_BY_LETTER[encoded_note[0]]
-    semitone_number += SEMITONES_BY_LETTER.size * encoded_note[1].to_i
-    frequency = 440 * (2 ** (1.0 / 12.0)) ** semitone_number
-    step = frequency * 2 * Math::PI / sample_rate
-
-    samples_to_generate
-      .times
-      .map do |i|
-        sample = encoded_note == '_' ? 0 : volume * Math.sin(i * step)
-        [sample].pack('e')
-      end
-  end
-
-  def play
-    music =  'C0 C0 G0 G0 A1 A1 G0 _ '
-    music +=  'F0 F0 E0 E0 D0 D0 C0 _ '
-
-    music +=  'G0 G0 F0 F0 E0 E0 D0 _ '
-    music +=  'G0 G0 F0 F0 E0 E0 D0 _ '
-
-    music +=  'C0 C0 G0 G0 A1 A1 G0 _ '
-    music +=  'F0 F0 E0 E0 D0 D0 C0 _ '
-
-    binary_wave = music.split(' ').map do |encoded_note|
+  def play music_key
+    print 'generating music wave file... '
+    binary_wave = MUSICS[music_key].map do |encoded_note|
       generate_sound(
         encoded_note: encoded_note,
         duration: 0.5,
@@ -60,9 +40,30 @@ class Beats
         .flatten
         .each { |packed_sample| file.write(packed_sample) }
     end
+    puts 'OK'
+
+    puts 'playing on ffplay... '
     system 'ffplay -showmode 1 -f f32le -ar 48000 output.bin'
+    puts 'done'
+  end
+
+  def generate_sound encoded_note:, duration:, sample_rate: 48000, volume: 1
+    samples_to_generate = (duration * sample_rate).to_i
+    return samples_to_generate.times.map { 0 } if (encoded_note == '_')
+
+    step = frequency_for_note(encoded_note) * 2 * Math::PI / sample_rate
+    (0 .. samples_to_generate).map do |i|
+      sample = encoded_note == '_' ? 0.0 : volume * Math.sin(i * step)
+      [sample].pack('e')
+    end
+  end
+
+  def frequency_for_note encoded_note
+    letter, octave = encoded_note.split('.')
+    semitone_number = SEMITONES_BY_LETTER[letter] + 12 * octave.to_i
+    440 * (2 ** (1.0 / 12.0)) ** semitone_number
   end
 end
 
 beats = Beats.new
-beats.play
+beats.play(:brilha_brilha_estrelinha)
