@@ -1,45 +1,68 @@
-def generate_sound frequency, duration
-  sample_rate = 48000 # samples / second
-  volume = 1
+class Beats
+  SEMITONES_BY_LETTER = {
+    'A'  =>  0,
+    'A#' =>  1,
+    'B'  =>  2,
+    'C'  =>  3,
+    'C#' =>  4,
+    'D'  =>  5,
+    'D#' =>  6,
+    'E'  =>  7,
+    'F'  =>  8,
+    'F#' =>  9,
+    'G'  => 10,
+    'G#' => 11
+  }
 
-  step = frequency * 2 * Math::PI / sample_rate
-  (duration * sample_rate)
-    .times
-    .map { |i| [volume * Math.sin(i * step)].pack('e') }
-end
+  def generate_sound encoded_note:, duration:, sample_rate: 48000, volume: 1
+    samples_to_generate = (duration * sample_rate).to_i
 
+    if (encoded_note == '_')
+      puts '---'
+      return samples_to_generate.times.map { |_| 0 }
+    end
 
-def note letter, duration
-  semitone_number = case letter
-    when 'A'  then 0
-    when 'A#' then 1
-    when 'B'  then 2
-    when 'C'  then 3
-    when 'C#' then 4
-    when 'D'  then 5
-    when 'D#' then 6
-    when 'E'  then 7
-    when 'F'  then 8
-    when 'F#' then 9
-    when 'G'  then 10
-    when 'G#' then 11
+    puts encoded_note
+
+    semitone_number = SEMITONES_BY_LETTER[encoded_note[0]]
+    semitone_number += SEMITONES_BY_LETTER.size * encoded_note[1].to_i
+    frequency = 440 * (2 ** (1.0 / 12.0)) ** semitone_number
+    step = frequency * 2 * Math::PI / sample_rate
+
+    samples_to_generate
+      .times
+      .map do |i|
+        sample = encoded_note == '_' ? 0 : volume * Math.sin(i * step)
+        [sample].pack('e')
+      end
   end
 
-  frequency_for_semitone = 440 * (2 ** (1.0 / 12.0)) ** semitone_number
-  generate_sound(frequency_for_semitone, duration)
+  def play
+    music =  'C0 C0 G0 G0 A1 A1 G0 _ '
+    music +=  'F0 F0 E0 E0 D0 D0 C0 _ '
+
+    music +=  'G0 G0 F0 F0 E0 E0 D0 _ '
+    music +=  'G0 G0 F0 F0 E0 E0 D0 _ '
+
+    music +=  'C0 C0 G0 G0 A1 A1 G0 _ '
+    music +=  'F0 F0 E0 E0 D0 D0 C0 _ '
+
+    binary_wave = music.split(' ').map do |encoded_note|
+      generate_sound(
+        encoded_note: encoded_note,
+        duration: 0.5,
+        volume: 0.20
+      )
+    end
+
+    File.open('output.bin', 'wb') do |file|
+      binary_wave
+        .flatten
+        .each { |packed_sample| file.write(packed_sample) }
+    end
+    system 'ffplay -showmode 1 -f f32le -ar 48000 output.bin'
+  end
 end
 
-binary_wave = [
-  note('D', 1),
-  note('D', 1),
-  note('D', 1),
-  note('D', 1),
-]
-
-File.open('output.bin', 'wb') do |file|
-  binary_wave
-    .concat(binary_wave)
-    .flatten
-    .each { |packed_sample| file.write(packed_sample) }
-end
-system 'ffplay -showmode 1 -f f32le -ar 48000 output.bin'
+beats = Beats.new
+beats.play
