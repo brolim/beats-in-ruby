@@ -1,3 +1,6 @@
+require_relative 'fft'
+require 'byebug'
+
 class Beats
   SEMITONE_BY_LETTER = {
     'A'  =>  0,
@@ -34,31 +37,39 @@ class Beats
 
   SAMPLE_RATE = 48000
 
-  def scale letter, scale_key
-    return if !SEMITONE_BY_LETTER[letter] || !SCALES[scale_key]
-
-    initial_semitone = SEMITONE_BY_LETTER[letter]
-    semitones = SCALES[scale_key].map { |scale_semitone| initial_semitone + scale_semitone }
-    semitones.map do |semitone|
-      octave = (semitone.to_f / 12).to_i
-      letter =  LETTER_BY_SEMITONE[semitone % 12]
-      "#{letter}.#{octave}"
-    end
+  def mix signal1, signal2
+    # TODO
   end
 
   def play key_or_encoded_notes, scale_key = nil
     print 'generating music wave file... '
-    encoded_notes = MUSICS[key_or_encoded_notes] || scale(key_or_encoded_notes, scale_key) || key_or_encoded_notes
-    puts 'encoded_notes'
-    puts encoded_notes
+    encoded_notes = MUSICS[key_or_encoded_notes] || scale(key_or_encoded_notes, scale_key) || key_or_encoded_notes.flatten
     generate_wave_file(encoded_notes: encoded_notes)
     puts 'OK'
     system 'ffplay -showmode 1 -f f32le -ar 48000 output.bin'
   end
 
-  def generate_wave_file encoded_notes:, volume: 0.2, output: 'output.bin'
-    binary_wave = encoded_notes.map do |encoded_note|
-      generate_binary_sound(
+  def scale encoded_note, scale_key
+    return if !encoded_note.is_a?(String)
+
+    letter, octave = encoded_note.split('.')
+    return if !SEMITONE_BY_LETTER[letter] || !SCALES[scale_key]
+
+    initial_semitone = SEMITONE_BY_LETTER[letter]
+    semitones = SCALES[scale_key].map do |scale_semitone|
+      initial_semitone + scale_semitone + 12 * octave.to_i
+    end
+
+    semitones.map do |semitone|
+      octave = (semitone.to_f / 12).floor
+      letter =  LETTER_BY_SEMITONE[semitone % 12]
+      "#{letter}.#{octave}"
+    end
+  end
+
+  def generate_wave_file encoded_notes:, volume: 1, output: 'output.bin'
+    signal = encoded_notes.map do |encoded_note|
+      generate_signal(
         encoded_note: encoded_note,
         duration: 0.8,
         volume: volume
@@ -66,11 +77,14 @@ class Beats
     end
 
     File.open(output, 'wb') do |file|
-      binary_wave.flatten.each { |bin_sample| file.write(bin_sample) }
+      signal.flatten.each do |sample|
+        bin_sample = [sample].pack('e') # float32bitsLE
+        file.write(bin_sample)
+      end
     end
   end
 
-  def generate_binary_sound encoded_note:, duration:, volume: 1
+  def generate_signal encoded_note:, duration:, volume: 1
     samples_to_generate = (duration * SAMPLE_RATE).ceil
     samples = (0 .. samples_to_generate - 1).to_a
 
@@ -78,13 +92,11 @@ class Beats
 
     step = frequency_for_note(encoded_note) * 2 * Math::PI / SAMPLE_RATE
     samples.fill do |i|
-      sample =
-        if encoded_note == '_'
-          0.0
-        else
-          volume * attack(i, duration) * release(i, duration) * Math.sin(i * step)
-        end
-      [sample].pack('e') # float32bitsLE
+      if encoded_note == '_'
+        0.0
+      else
+        volume * attack(i, duration) * release(i, duration) * Math.sin(i * step)
+      end
     end
   end
 

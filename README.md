@@ -1,19 +1,15 @@
-# Beats in Ruby
+# Beats-in-Ruby
 
 Made on Ruby 3.0.2
 
-## Requirements
-- ffplay
-- run `sudo apt-get install ffplay` to install it
-
 ## Instalation
-
-Pull Beats code from github:
 ```
+sudo apt-get install ffplay libfftw3-dev libfftw3-doc
+rvm install "ruby-3.0.2"
 git clone git@github.com:brolim/beats-in-ruby.git
+cd beats-in-ruby
+bundle install
 ```
-
-You will need only `Beats` class.
 
 ## Usage
 ```
@@ -23,11 +19,10 @@ beats.play('C', :minor)
 
 ## Examples
 
-See `play.rb` file and get some examples.
+See `play.rb` file to learn some examples.
 
-You may want to run the default example and hear a C minor scale running `play.rb`
+You may want to run the default example and hear a C minor scale:
 ```
 cd path-to/beats-in-ruby
 ruby play.rb
 ```
-
