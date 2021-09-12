@@ -4,7 +4,7 @@ beats = Beats.new
 
 # -------
 # You can use Beats::MUSICS constant to play any note sequence. There is one there as an example:
-  #
+#
 # beats.play(:brilha_brilha_estrelinha)
 
 
@@ -32,10 +32,18 @@ beats = Beats.new
 
 
 # -------
-# You can mix two sound waves in the same time frame to compound more complex sounds
+# You can mix different sound waves and play them together, mixing signals
 #
-# c_signal = beats.generate_signal(encoded_note: 'C.0', duration: 0.8, volume: 0.2)
-# b_signal = beats.generate_signal(encoded_note: 'C.0', duration: 0.8, volume: 0.2)
-# signal = beats.mix(c_signal, b_signal)
-# beats.play(signal)
+signal = [
+  beats.generate_signal(encoded_note: 'C.-2', duration: 9, volume: 0.2),
+  beats.generate_signal(encoded_note: 'E.-2', duration: 8, volume: 0.2),
+  beats.generate_signal(encoded_note: 'G.-2', duration: 7, volume: 0.2),
+  beats.generate_signal(encoded_note: 'C.-1', duration: 6, volume: 0.2),
+  beats.generate_signal(encoded_note: 'E.-1', duration: 5, volume: 0.2),
+  beats.generate_signal(encoded_note: 'G.-1', duration: 4, volume: 0.2),
+  beats.generate_signal(encoded_note: 'C.0', duration: 3, volume: 0.2),
+  beats.generate_signal(encoded_note: 'E.0', duration: 2, volume: 0.2),
+  beats.generate_signal(encoded_note: 'G.0', duration: 1, volume: 0.2)
+]
+beats.play(beats.mix(*signal))
 

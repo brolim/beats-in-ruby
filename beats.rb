@@ -1,4 +1,4 @@
-require_relative 'fft'
+require 'fftw3'
 require 'byebug'
 
 class Beats
@@ -37,8 +37,10 @@ class Beats
 
   SAMPLE_RATE = 48000
 
-  def mix signal1, signal2
-    # TODO
+  def mix *signals
+    signals.map(&:size).max.times.map do |i|
+      signals.map { |signal| signal[i].to_f }.sum
+    end
   end
 
   def play key_or_encoded_notes, scale_key = nil
@@ -69,11 +71,15 @@ class Beats
 
   def generate_wave_file encoded_notes:, volume: 1, output: 'output.bin'
     signal = encoded_notes.map do |encoded_note|
-      generate_signal(
-        encoded_note: encoded_note,
-        duration: 0.8,
-        volume: volume
-      )
+      if encoded_note.is_a?(String)
+        generate_signal(
+          encoded_note: encoded_note,
+          duration: 0.8,
+          volume: 0.5 || volume
+        )
+      else
+        encoded_note
+      end
     end
 
     File.open(output, 'wb') do |file|
