@@ -35,15 +35,15 @@ beats = Beats.new
 # You can mix different sound waves and play them together, mixing signals
 #
 signal = [
-  beats.generate_signal(encoded_note: 'C.-2', duration: 9, volume: 0.2),
+  beats.generate_signal(encoded_note: 'C.-2', duration: 9, volume: 0.5),
   beats.generate_signal(encoded_note: 'E.-2', duration: 8, volume: 0.2),
-  beats.generate_signal(encoded_note: 'G.-2', duration: 7, volume: 0.2),
-  beats.generate_signal(encoded_note: 'C.-1', duration: 6, volume: 0.2),
+  beats.generate_signal(encoded_note: 'G.-2', duration: 7, volume: 0.5),
+  beats.generate_signal(encoded_note: 'C.-1', duration: 6, volume: 0.5),
   beats.generate_signal(encoded_note: 'E.-1', duration: 5, volume: 0.2),
-  beats.generate_signal(encoded_note: 'G.-1', duration: 4, volume: 0.2),
-  beats.generate_signal(encoded_note: 'C.0', duration: 3, volume: 0.2),
+  beats.generate_signal(encoded_note: 'G.-1', duration: 4, volume: 0.5),
+  beats.generate_signal(encoded_note: 'C.0', duration: 3, volume: 0.5),
   beats.generate_signal(encoded_note: 'E.0', duration: 2, volume: 0.2),
-  beats.generate_signal(encoded_note: 'G.0', duration: 1, volume: 0.2)
+  beats.generate_signal(encoded_note: 'G.0', duration: 1, volume: 0.5)
 ]
 beats.play(beats.mix(*signal))
 

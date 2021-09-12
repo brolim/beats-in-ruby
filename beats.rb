@@ -38,8 +38,17 @@ class Beats
   SAMPLE_RATE = 48000
 
   def mix *signals
-    signals.map(&:size).max.times.map do |i|
-      signals.map { |signal| signal[i].to_f }.sum
+    greatest_volume = 0.0
+    mixed_signal = signals.map(&:size).max.times.map do |i|
+      mixed_sample = signals.map { |signal| signal[i].to_f }.sum
+      greatest_volume = mixed_sample.abs if mixed_sample.abs > greatest_volume
+      mixed_sample
+    end
+
+    if greatest_volume > 1.0
+      mixed_signal.map { |mixed_sample| mixed_sample.to_f / greatest_volume }
+    else
+      mixed_signal
     end
   end
 
@@ -75,7 +84,7 @@ class Beats
         generate_signal(
           encoded_note: encoded_note,
           duration: 0.8,
-          volume: 0.5 || volume
+          volume: volume
         )
       else
         encoded_note
