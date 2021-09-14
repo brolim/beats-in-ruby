@@ -3,6 +3,7 @@ class Note
   attr_accessor :octave
   attr_accessor :duration
   attr_accessor :volume
+  attr_accessor :release_size
 
   SEMITONE_BY_LETTER = {
     'A'  =>  0,
@@ -33,11 +34,12 @@ class Note
     minor: [0, 2, 3, 5, 7, 8, 10, 12]
   }
 
-  def initialize(letter: 'A', octave: 0, duration: 1.0, volume: 0.5)
+  def initialize(letter: 'A', octave: 0, duration: 1.0, volume: 0.5, release_size: 0.10)
     @letter = letter
     @octave = octave
     @duration = duration
     @volume = volume
+    @release_size = release_size || 0.10
   end
 
   def samples
@@ -65,7 +67,7 @@ class Note
 
   def release i
     n_samples = SAMPLE_RATE * @duration
-    n_samples_release = 0.10 * n_samples
+    n_samples_release = @release_size * n_samples
     release_step = 1.0 / n_samples_release
     [1.0, release_step * (n_samples - i)].min
   end
@@ -74,14 +76,16 @@ class Note
     encoded_notes,
     note_duration: 0.5,
     volume: 0.5,
-    octave_offset: 0
+    octave_offset: 0,
+    release_size: nil
   )
     encoded_notes.flatten.map do |encoded_note|
       build_one(
         encoded_note,
         duration: note_duration,
         volume: volume,
-        octave_offset: octave_offset
+        octave_offset: octave_offset,
+        release_size: release_size
       )
     end
   end
@@ -90,7 +94,8 @@ class Note
     encoded_note,
     duration: 0.5,
     volume: 0.5,
-    octave_offset: 0
+    octave_offset: 0,
+    release_size: nil
   )
     letter, octave = encoded_note.split('.')
     Note.new(
@@ -98,6 +103,7 @@ class Note
       octave: octave.to_i + octave_offset,
       duration: duration,
       volume: volume,
+      release_size: release_size
     )
   end
 
