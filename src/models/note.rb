@@ -1,4 +1,4 @@
-class MusicalNote
+class Note
   attr_accessor :letter
   attr_accessor :octave
   attr_accessor :duration
@@ -93,7 +93,7 @@ class MusicalNote
     octave_offset: 0
   )
     letter, octave = encoded_note.split('.')
-    MusicalNote.new(
+    Note.new(
       letter: letter,
       octave: octave.to_i + octave_offset,
       duration: duration,
@@ -117,7 +117,7 @@ class MusicalNote
     semitones[0..number_of_notes].map do |semitone|
       octave = (semitone.to_f / 12).floor
       letter =  LETTER_BY_SEMITONE[semitone % 12]
-      MusicalNote.new(
+      Note.new(
         letter: letter,
         octave: octave + octave,
         duration: note_duration,

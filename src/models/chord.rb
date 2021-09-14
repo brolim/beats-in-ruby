@@ -1,3 +1,4 @@
+require_relative '../services/mixer'
 require 'byebug'
 
 class Chord
@@ -28,16 +29,16 @@ class Chord
   end
 
   def samples
-    initial_semitone = MusicalNote::SEMITONE_BY_LETTER[@letter]
+    initial_semitone = Note::SEMITONE_BY_LETTER[@letter]
     semitones = NOTES_BY_CHORD_TYPE[@chord_type].map do |base_semitone|
       base_semitone + initial_semitone.to_i
     end
 
-    print "Chord #{@letter}#{formatted_chord_type} (#{@octave}): "
+    print "Chord #{formatted_chord} (#{@octave}): "
     sets_of_samples = semitones.map do |semitone|
-      letter = initial_semitone ? MusicalNote::LETTER_BY_SEMITONE[semitone % 12] : '_'
+      letter = initial_semitone ? Note::LETTER_BY_SEMITONE[semitone % 12] : '_'
       print "#{letter} "
-      note = MusicalNote.new(
+      note = Note.new(
         letter: letter,
         octave: @octave,
         duration: @duration,
@@ -46,15 +47,16 @@ class Chord
       note.samples
     end
     puts ''
-    SoundWave.mix(*sets_of_samples)
+    Mixer.samples_from(*sets_of_samples)
   end
 
-  def formatted_chord_type
-    case @chord_type
-      when :major then return ''
-      when :minor then return 'm'
-      else return "wrong ct: #{@chord_type}"
+  def formatted_chord
+    chord_type = case @chord_type
+      when :major then ''
+      when :minor then 'm'
+      else "wrong ct: #{@chord_type}"
     end
+    "#{@letter}#{chord_type}"
   end
 
   def self.build_many(
