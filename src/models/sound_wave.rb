@@ -20,16 +20,18 @@ class SoundWave
     return true
   end
 
-  def self.mix_and_build *sets_of_musical_notes
-    mixed_samples_size = 0
-    sets_of_samples = sets_of_musical_notes.map do |musical_notes|
-      samples = musical_notes.map(&:samples).flatten
-      mixed_samples_size = samples.size if samples.size > mixed_samples_size
-      samples
-    end
 
+  def self.mix_and_build *sets_of_musical_notes
+    sets_of_samples = sets_of_musical_notes.map do |musical_notes|
+      musical_notes.map(&:samples).flatten
+    end
+    SoundWave.new(samples: mix(*sets_of_samples))
+  end
+
+  def self.mix *sets_of_samples
     greatest_volume = 0.0
-    mixed_signal = mixed_samples_size.times.map do |i|
+
+    mixed_signal = sets_of_samples.map(&:size).max.times.map do |i|
       mixed_sample = sets_of_samples.map { |samples| samples[i].to_f }.sum
       greatest_volume = mixed_sample.abs if mixed_sample.abs > greatest_volume
       mixed_sample
@@ -40,7 +42,5 @@ class SoundWave
     else
       mixed_signal
     end
-
-    SoundWave.new(samples: mixed_signal)
   end
 end

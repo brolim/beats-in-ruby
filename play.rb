@@ -20,13 +20,19 @@ beats = Beats.new
 # -------
 # You can mix different sound waves and play them together, mixing signals on time domain
 #
-beats.play_parallel(
-  MusicalNote.build_many_for_scale('C', :major, octave: -1),
-  MusicalNote.build_many_for_scale('E', :major, octave: -1),
-  MusicalNote.build_many_for_scale('G', :major, octave: -1),
-  [
-    MusicalNote.new(letter: 'G', duration: 1),
-    MusicalNote.new(letter: 'E', duration: 1),
-    MusicalNote.new(letter: 'C', duration: 1)
-  ]
-)
+# beats.play_parallel(
+#   MusicalNote.build_many_for_scale('C', :major, octave: -1),
+#   MusicalNote.build_many_for_scale('E', :major, octave: -1),
+#   MusicalNote.build_many_for_scale('G', :major, octave: -1),
+#   [
+#     MusicalNote.new(letter: 'G', duration: 1),
+#     MusicalNote.new(letter: 'E', duration: 1),
+#     MusicalNote.new(letter: 'C', duration: 1)
+#   ]
+# )
+
+# beats.play_chord('C.-1.minor', duration: 5)
+beats.play_chords(%w[
+  C.-1 A.-1.minor F.-1 G.-1 F.-1 D.-1.minor A.-1.minor
+  C.-1 A.-1.minor F.-1 G.-1 F.-1 D.-1.minor A.-1.minor
+])

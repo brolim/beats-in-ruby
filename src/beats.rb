@@ -1,3 +1,4 @@
+require_relative 'models/chord'
 require_relative 'models/musical_note'
 require_relative 'models/sound_wave'
 
@@ -45,6 +46,29 @@ class Beats
 
   def play_parallel *sets_of_musical_notes
     play(SoundWave.mix_and_build(*sets_of_musical_notes))
+  end
+
+  def play_chords(encoded_chords, chord_duration: 1.0, volume: 0.5, octave_offset: 0)
+    sets_of_samples = encoded_chords.map do |encoded_chord|
+      letter, octave, chord_type = encoded_chord.split('.')
+      Chord.new(
+        letter,
+        :"#{chord_type || 'major'}",
+        octave: octave.to_i + octave_offset,
+        duration: chord_duration,
+        volume: volume
+      ).samples
+    end
+
+    play(SoundWave.new(samples: sets_of_samples.flatten))
+  end
+
+  def play_chord encoded_chord, duration: 1.0, volume: 0.5
+    play_chords(
+      [encoded_chord],
+      chord_duration: duration,
+      volume: volume
+    )
   end
 
   def play sound_wave

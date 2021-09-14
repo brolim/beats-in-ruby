@@ -16,9 +16,17 @@ class MusicalNote
     'F'  =>  8,
     'F#' =>  9,
     'G'  => 10,
-    'G#' => 11
+    'G#' => 11,
+
+    'Ab' => -1,
+    'Bb' =>  1,
+    'Cb' =>  2,
+    'Db' =>  4,
+    'Eb' =>  6,
+    'Fb' =>  7,
+    'Gb' =>  9,
   }
-  LETTER_BY_SEMITONE = SEMITONE_BY_LETTER.invert
+  LETTER_BY_SEMITONE = SEMITONE_BY_LETTER.invert.merge(-2 => 'G#')
   SAMPLE_RATE = 48000
   SCALES = {
     major: [0, 2, 4, 5, 7, 9, 11, 12],
@@ -57,21 +65,40 @@ class MusicalNote
 
   def release i
     n_samples = SAMPLE_RATE * @duration
-    n_samples_release = 0.05 * n_samples
+    n_samples_release = 0.10 * n_samples
     release_step = 1.0 / n_samples_release
     [1.0, release_step * (n_samples - i)].min
   end
 
-  def self.build_many encoded_notes, note_duration: 0.5, volume: 0.5, octave_offset: 0
-    encoded_notes.flatten.map do |encoded_note|
-      letter, octave = encoded_note.split('.')
-      MusicalNote.new(
-        letter: letter,
-        octave: octave.to_i + octave_offset,
+  def self.build_many(
+    encoded_notes,
+    note_duration: 0.5,
+    volume: 0.5,
+    octave_offset: 0
+  )
+    encoded_notes.flatten.map do |note|
+      build_one(
+        encoded_note,
         duration: note_duration,
         volume: volume,
+        octave_offset: octave_offset
       )
     end
+  end
+
+  def self.build_one(
+    encoded_note,
+    note_duration: 0.5,
+    volume: 0.5,
+    octave_offset: 0
+  )
+    letter, octave = encoded_note.split('.')
+    MusicalNote.new(
+      letter: letter,
+      octave: octave.to_i + octave_offset,
+      duration: note_duration,
+      volume: volume,
+    )
   end
 
   def self.build_many_for_scale letter, scale_key, number_of_notes: 8, octave: 0, note_duration: 0.5, volume: 0.5
