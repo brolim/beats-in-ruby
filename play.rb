@@ -18,6 +18,16 @@ beats = Beats.new
 
 
 # -------
+# You can play a single chord or a sequence of them using encoded chords string:
+#
+# beats.play_chord('C.-1.minor', duration: 5)
+# beats.play_chords(%w[
+#   C.-1 A.-1.minor F.-1 G.-1 F.-1 D.-1.minor A.-1.minor
+#   C.-1 A.-1.minor F.-1 G.-1 F.-1 D.-1.minor A.-1.minor
+# ])
+
+
+# -------
 # You can mix different sound waves and play them together, mixing signals on time domain
 #
 # beats.play_parallel(
@@ -30,9 +40,10 @@ beats = Beats.new
 #     MusicalNote.new(letter: 'C', duration: 1)
 #   ]
 # )
-
-# beats.play_chord('C.-1.minor', duration: 5)
-beats.play_chords(%w[
-  C.-1 A.-1.minor F.-1 G.-1 F.-1 D.-1.minor A.-1.minor
-  C.-1 A.-1.minor F.-1 G.-1 F.-1 D.-1.minor A.-1.minor
-])
+#
+beats.play_parallel(
+  Chord.build_many(%w[C.-3 A.-3.minor F.-3 G.-3 F.-3 D.-3.minor A.-3.minor]),
+  Chord.build_many(%w[C.-2 A.-2.minor F.-2 G.-2 F.-2 D.-2.minor A.-2.minor]),
+  Chord.build_many(%w[C.-1 A.-1.minor F.-1 G.-1 F.-1 D.-1.minor A.-1.minor]),
+  Chord.build_many(%w[C.0 A.0.minor F.0 G.0 F.0 D.0.minor A.0.minor]),
+)
