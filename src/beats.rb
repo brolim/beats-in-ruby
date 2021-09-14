@@ -49,18 +49,17 @@ class Beats
   end
 
   def play_chords(encoded_chords, chord_duration: 1.0, volume: 0.5, octave_offset: 0)
-    sets_of_samples = encoded_chords.map do |encoded_chord|
-      letter, octave, chord_type = encoded_chord.split('.')
-      Chord.new(
-        letter,
-        :"#{chord_type || 'major'}",
-        octave: octave.to_i + octave_offset,
-        duration: chord_duration,
-        volume: volume
-      ).samples
-    end
-
-    play(SoundWave.new(samples: sets_of_samples.flatten))
+    chords = Chord.build_many(
+      encoded_chords,
+      volume: volume,
+      octave_offset: octave_offset,
+      chord_duration: chord_duration,
+    )
+    play(
+      SoundWave.new(
+        samples: chords.map(&:samples).flatten
+      )
+    )
   end
 
   def play_chord encoded_chord, duration: 1.0, volume: 0.5

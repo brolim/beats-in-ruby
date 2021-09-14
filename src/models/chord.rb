@@ -56,4 +56,36 @@ class Chord
       else return "wrong ct: #{@chord_type}"
     end
   end
+
+  def self.build_many(
+    encoded_chords,
+    chord_duration: 0.5,
+    volume: 0.5,
+    octave_offset: 0
+  )
+    encoded_chords.flatten.map do |encoded_chord|
+      build_one(
+        encoded_chord,
+        duration: chord_duration,
+        volume: volume,
+        octave_offset: octave_offset
+      )
+    end
+  end
+
+  def self.build_one(
+    encoded_chord,
+    duration: 0.5,
+    volume: 0.5,
+    octave_offset: 0
+  )
+    letter, octave, chord_type = encoded_chord.split('.')
+    Chord.new(
+      letter,
+      :"#{chord_type || 'major'}",
+      octave: octave.to_i + octave_offset,
+      duration: duration,
+      volume: volume
+    )
+  end
 end

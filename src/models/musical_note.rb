@@ -76,7 +76,7 @@ class MusicalNote
     volume: 0.5,
     octave_offset: 0
   )
-    encoded_notes.flatten.map do |note|
+    encoded_notes.flatten.map do |encoded_note|
       build_one(
         encoded_note,
         duration: note_duration,
@@ -88,7 +88,7 @@ class MusicalNote
 
   def self.build_one(
     encoded_note,
-    note_duration: 0.5,
+    duration: 0.5,
     volume: 0.5,
     octave_offset: 0
   )
@@ -96,7 +96,7 @@ class MusicalNote
     MusicalNote.new(
       letter: letter,
       octave: octave.to_i + octave_offset,
-      duration: note_duration,
+      duration: duration,
       volume: volume,
     )
   end
