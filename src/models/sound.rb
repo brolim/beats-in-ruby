@@ -6,7 +6,7 @@ class Sound
 
   OUTPUTS_FOLDER = 'outputs'
 
-  def initialize samples:, output_name: 'output2'
+  def initialize samples:, output_name: 'output'
     @samples = samples
     @output_name = output_name
   end
