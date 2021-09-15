@@ -28,7 +28,7 @@ class Note
     'Gb' =>  9,
   }
   LETTER_BY_SEMITONE = SEMITONE_BY_LETTER.invert.merge(-2 => 'G#')
-  SAMPLE_RATE = 48000
+  SAMPLE_RATE = 44100
   SCALES = {
     major: [0, 2, 4, 5, 7, 9, 11, 12],
     minor: [0, 2, 3, 5, 7, 8, 10, 12]

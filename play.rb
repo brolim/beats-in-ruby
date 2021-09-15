@@ -41,7 +41,13 @@ beats = Beats.new
 #   ]
 # )
 #
+# beats.save_parallel(
+#   Chord.build_many(%w[C.-2 A.-2.minor F.-2 G.-2 F.-2 D.-2.minor A.-2.minor], chord_duration: 0.8),
+#   Note.build_many(%w[C.1 A.1 F.1 G.1 F.1 D.1 A.1], note_duration: 0.8, release_size: 0.8),
+# )
+#
 beats.play_parallel(
   Chord.build_many(%w[C.-2 A.-2.minor F.-2 G.-2 F.-2 D.-2.minor A.-2.minor], chord_duration: 0.8),
   Note.build_many(%w[C.1 A.1 F.1 G.1 F.1 D.1 A.1], note_duration: 0.8, release_size: 0.8),
 )
+

@@ -66,12 +66,10 @@ class Beats
   end
 
   def play_parallel *parallel_sounds
-    sets_of_samples = parallel_sounds.map do |serial_sounds|
-      serial_sounds.map(&:samples).flatten
-    end
+    Sound.build_parallel(*parallel_sounds).play
+  end
 
-    Sound
-      .new(samples: Mixer.samples_from(*sets_of_samples))
-      .play
+  def save_parallel *parallel_sounds
+    Sound.build_parallel(*parallel_sounds).save!
   end
 end
