@@ -46,8 +46,42 @@ beats = Beats.new
 #   Note.build_many(%w[C.1 A.1 F.1 G.1 F.1 D.1 A.1], note_duration: 0.8, release_size: 0.8),
 # )
 #
-beats.play_parallel(
-  Chord.build_many(%w[C.-2 A.-2.minor F.-2 G.-2 F.-2 D.-2.minor A.-2.minor], chord_duration: 0.8),
-  Note.build_many(%w[C.1 A.1 F.1 G.1 F.1 D.1 A.1], note_duration: 0.8, release_size: 0.8),
-)
+# beats.play_parallel(
+#   Chord.build_many(%w[C.-2 A.-2.minor F.-2 G.-2 F.-2 D.-2.minor A.-2.minor], chord_duration: 0.8),
+#   Note.build_many(%w[C.1 A.1 F.1 G.1 F.1 D.1 A.1], note_duration: 0.8, release_size: 0.8),
+# )
 
+
+Sound.build_from_tracks(
+  [
+    { chord: 'C',  octave: -1, duration: 0.9, volume: 0.9 },
+    { chord: 'Am', octave: -1, duration: 0.9, volume: 0.9 },
+    { chord: 'F',  octave: -1, duration: 0.9, volume: 0.9 },
+    { chord: 'G',  octave: -1, duration: 0.9, volume: 0.9 },
+    { chord: 'F',  octave: -1, duration: 0.9, volume: 0.9 },
+    { chord: 'Dm', octave: -1, duration: 0.9, volume: 0.9 },
+    { chord: 'Am', octave: -1, duration: 0.9, volume: 0.9 },
+  ],[
+    { note: 'C', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'C', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'C', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'G', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'G', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'G', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'D', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'D', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'D', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
+  ],
+).play
