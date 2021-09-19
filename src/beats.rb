@@ -1,6 +1,8 @@
 require_relative 'models/chord'
 require_relative 'models/note'
 require_relative 'models/sound'
+require_relative 'models/track'
+require_relative 'models/scale'
 
 class Beats
   MUSICS = {
@@ -27,17 +29,33 @@ class Beats
     )
   end
 
-  def play_scale letter, scale_key, volume: 0.5, octave: 0, note_duration: 0.5, number_of_notes: 8
-    play(
-      Note.build_many_for_scale(
-        letter,
-        scale_key,
-        octave: octave,
-        volume: volume,
-        note_duration: note_duration,
-        number_of_notes: number_of_notes
-      )
+  def play_scale note, scale_type, octave: 0, number_of_notes: 8, note_duration: 0.5, volume: 0.5
+    track = Track.build_from_encoded_tracks(
+      {
+        track_name: "scale for #{ note } #{ scale_type }",
+        octave_offset: octave,
+        sequence: Scale.new(
+          note: note,
+          scale_type: scale_type,
+          octave: octave,
+          number_of_notes: number_of_notes,
+          note_duration: note_duration,
+          volume: volume,
+        ).track_sequence
+      }
     )
+    Sound.new(samples: track.samples).play
+
+    # play(
+    #   Note.build_many_for_scale(
+    #     note,
+    #     scale_type,
+    #     octave: octave,
+    #     volume: volume,
+    #     note_duration: note_duration,
+    #     number_of_notes: number_of_notes
+    #   )
+    # )
   end
 
   def play_chord encoded_chord, duration: 1.0, volume: 0.5

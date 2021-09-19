@@ -1,8 +1,11 @@
-class Note
-  attr_accessor :letter
+require_relative 'sound'
+
+class Note < Sound
+  attr_accessor :note
   attr_accessor :octave
   attr_accessor :duration
   attr_accessor :volume
+  attr_accessor :times
   attr_accessor :release_size
 
   SEMITONE_BY_LETTER = {
@@ -34,11 +37,19 @@ class Note
     minor: [0, 2, 3, 5, 7, 8, 10, 12]
   }
 
-  def initialize(letter: 'A', octave: 0, duration: 1.0, volume: 0.5, release_size: 0.10)
-    @letter = letter
+  def initialize(
+    note: 'A',
+    octave: 0,
+    duration: 1.0,
+    volume: 0.5,
+    times: 1,
+    release_size: 0.10
+  )
+    @note = note
     @octave = octave
     @duration = duration
     @volume = volume
+    @times = times
     @release_size = release_size || 0.10
   end
 
@@ -46,16 +57,19 @@ class Note
     samples_to_generate = (@duration * SAMPLE_RATE).ceil
     samples = (0 .. samples_to_generate - 1).to_a
 
-    return samples.fill(0) if (@letter == '_')
+    return samples.fill(0) if (@note == '_')
 
     step = frequency * 2 * Math::PI / SAMPLE_RATE
     samples.fill do |i|
       @volume * attack(i) * release(i) * Math.sin(i * step)
     end
+
+    samples = @times.times.map { samples }.flatten if (@times > 1)
+    samples
   end
 
   def frequency
-    semitone_number = SEMITONE_BY_LETTER[@letter] + 12 * @octave
+    semitone_number = SEMITONE_BY_LETTER[@note] + 12 * @octave
     440 * (2 ** (1.0 / 12.0)) ** semitone_number
   end
 
@@ -94,41 +108,40 @@ class Note
     encoded_note,
     duration: 0.5,
     volume: 0.5,
+    times: 1,
     octave_offset: 0,
     release_size: nil
   )
-    letter, octave = encoded_note.split('.')
-    Note.new(
-      letter: letter,
+    note_attrs = decode(encoded_note, octave_offset.to_i).merge(
+      duration: duration,
+      volume: volume,
+      times: times,
+      release_size: release_size
+    )
+    Note.new(**note_attrs)
+  end
+
+  def self.decode encoded_note, octave_offset = 0
+    # encoded_note examples: 'A.0' || 'C.1' || 'D' || 'G#.1' || ...]
+    note, octave = encoded_note.split('.')
+    {
+      note: note,
+      octave: octave.to_i + octave_offset
+    }
+  end
+
+  def encode octave_offset = 0
+    "#{ note }.#{ octave + octave_offset }"
+  end
+
+  def to_hash octave_offset = 0
+    {
+      note: note,
       octave: octave.to_i + octave_offset,
       duration: duration,
       volume: volume,
+      times: times,
       release_size: release_size
-    )
-  end
-
-  def self.build_many_for_scale letter, scale_key, number_of_notes: 8, octave: 0, note_duration: 0.5, volume: 0.5
-    return if !SEMITONE_BY_LETTER[letter] || !SCALES[scale_key]
-
-    initial_semitone = SEMITONE_BY_LETTER[letter]
-    semitones = SCALES[scale_key].map do |scale_semitone|
-      initial_semitone + scale_semitone + 12 * octave
-    end
-
-    positive_semitones = SCALES[scale_key][1..-1]
-    while semitones.size < number_of_notes
-      semitones += positive_semitones.map { |semitone| semitones.last + semitone }
-    end
-
-    semitones[0..number_of_notes].map do |semitone|
-      octave = (semitone.to_f / 12).floor
-      letter =  LETTER_BY_SEMITONE[semitone % 12]
-      Note.new(
-        letter: letter,
-        octave: octave + octave,
-        duration: note_duration,
-        volume: volume,
-      )
-    end
+    }
   end
 end

@@ -1,8 +1,8 @@
-require_relative '../services/mixer'
+require_relative 'sound'
 require 'byebug'
 
-class Chord
-  attr_accessor :letter
+class Chord < Sound
+  attr_accessor :note
   attr_accessor :chord_type
   attr_accessor :octave
   attr_accessor :duration
@@ -15,31 +15,33 @@ class Chord
   }
 
   def initialize(
-    letter = 'A',
-    chord_type = :major,
+    note:,
+    chord_type: :major,
     octave: 0,
     duration: 1.0,
-    volume: 0.5
+    volume: 0.5,
+    times: 1
   )
-    @letter = letter
+    @note = note
     @chord_type = chord_type
     @octave = octave
     @duration = duration
     @volume = volume
+    @times = times
   end
 
   def samples
-    initial_semitone = Note::SEMITONE_BY_LETTER[@letter]
+    initial_semitone = Note::SEMITONE_BY_LETTER[@note]
     semitones = NOTES_BY_CHORD_TYPE[@chord_type].map do |base_semitone|
       base_semitone + initial_semitone.to_i
     end
 
-    print "Chord #{formatted_chord} (#{@octave}): "
+    print "#{ @times }x #{formatted_chord} (#{@octave}): "
     sets_of_samples = semitones.map do |semitone|
-      letter = initial_semitone ? Note::LETTER_BY_SEMITONE[semitone % 12] : '_'
-      print "#{letter} "
+      note = initial_semitone ? Note::LETTER_BY_SEMITONE[semitone % 12] : '_'
+      print "#{note} "
       note = Note.new(
-        letter: letter,
+        note: note,
         octave: @octave,
         duration: @duration,
         volume: @volume,
@@ -47,7 +49,10 @@ class Chord
       note.samples
     end
     puts ''
-    Mixer.samples_from(*sets_of_samples)
+
+    samples = Track.mix_samples(*sets_of_samples)
+    samples = @times.times.map { samples }.flatten if (@times > 1)
+    samples
   end
 
   def formatted_chord
@@ -56,7 +61,7 @@ class Chord
       when :minor then 'm'
       else "wrong ct: #{@chord_type}"
     end
-    "#{@letter}#{chord_type}"
+    "#{@note}#{chord_type}"
   end
 
   def self.build_many(
@@ -79,15 +84,30 @@ class Chord
     encoded_chord,
     duration: 0.5,
     volume: 0.5,
+    times: 1,
     octave_offset: 0
   )
-    letter, octave, chord_type = encoded_chord.split('.')
-    Chord.new(
-      letter,
-      :"#{chord_type || 'major'}",
-      octave: octave.to_i + octave_offset,
+    chord_attrs = decode(encoded_chord, octave_offset.to_i).merge(
       duration: duration,
-      volume: volume
+      volume: volume,
+      times: times,
     )
+    Chord.new(**chord_attrs)
+  end
+
+  def encode decoded_chord, octave_offset: 0
+    # decoded_chord example: { note: 'A', octave: 1, chord_type: 'minor' }
+    note, octave, chord_type = decoded_chord.values_at(:note, :octave, :chord_type)
+    "#{ note }.#{ octave + octave_offset }.#{ chord_type }"
+  end
+
+  def self.decode encoded_chord, octave_offset = 0
+    # encoded_chord examples: 'Am.0.minor' || 'C.1' || 'D' || 'G#m.1' || ...]
+    chord, octave = encoded_chord.split('.')
+    {
+      note: chord.gsub(/[^A^B^C^D^E^F^G^#^b]/, ''),
+      chord_type: chord.include?('m') ? :minor : :major,
+      octave: octave.to_i + octave_offset
+    }
   end
 end

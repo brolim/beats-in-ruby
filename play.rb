@@ -11,7 +11,7 @@ beats = Beats.new
 # -------
 # You can play specific scales setting mode and octave for each one:
 #
-# beats.play_scale('C', :minor)
+beats.play_scale('C', :major)
 # beats.play_scale('G#', :major, octave: -1)
 # beats.play_scale('A', :major, octave: -1, number_of_notes: 49)
 # beats.play_scale('G#', :major, octave: 2)
@@ -51,37 +51,42 @@ beats = Beats.new
 #   Note.build_many(%w[C.1 A.1 F.1 G.1 F.1 D.1 A.1], note_duration: 0.8, release_size: 0.8),
 # )
 
+# i_will_survive = {
+#   chords: [
+#     { chord: 'A',  octave:  0, duration: 1.0, volume: 0.6, times: 2 },
+#     { chord: 'Dm', octave:  0, duration: 1.0, volume: 0.6, times: 2 },
+#     { chord: 'G',  octave: -1, duration: 1.0, volume: 0.6, times: 2 },
+#     { chord: 'Cm', octave:  0, duration: 1.0, volume: 0.6, times: 2 },
+#     { chord: 'F',  octave: -1, duration: 1.0, volume: 0.6, times: 2 },
+#     { chord: 'Bm', octave:  0, duration: 1.0, volume: 0.6, times: 2 },
+#     { chord: 'E',  octave: -1, duration: 1.0, volume: 0.6, times: 4 },
+#   ],
+#   solo: [
+#     { note: 'A', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
+#     { note: 'D', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
+#     { note: 'G', octave: -1, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
+#     { note: 'C', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
+#     { note: 'F', octave: -1, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
+#     { note: 'B', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
+#     { note: 'E', octave: -1, duration: 0.25, release_size: 0.8, volume: 0.9, times: 16 },
+#   ]
+# }
 
-Sound.build_from_tracks(
-  [
-    { chord: 'C',  octave: -1, duration: 0.9, volume: 0.9 },
-    { chord: 'Am', octave: -1, duration: 0.9, volume: 0.9 },
-    { chord: 'F',  octave: -1, duration: 0.9, volume: 0.9 },
-    { chord: 'G',  octave: -1, duration: 0.9, volume: 0.9 },
-    { chord: 'F',  octave: -1, duration: 0.9, volume: 0.9 },
-    { chord: 'Dm', octave: -1, duration: 0.9, volume: 0.9 },
-    { chord: 'Am', octave: -1, duration: 0.9, volume: 0.9 },
-  ],[
-    { note: 'C', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'C', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'C', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'G', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'G', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'G', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'F', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'D', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'D', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'D', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-    { note: 'A', octave: 0, duration: 0.3, release_size: 0.8, volume: 0.2 },
-  ],
-).play
+# track = Track.build_from_encoded_tracks(
+#   {
+#     track_name: 'base1',
+#     octave_offset: -1,
+#     sequence: i_will_survive[:chords]
+#   },
+#   {
+#     track_name: 'base2',
+#     octave_offset: 0,
+#     sequence: i_will_survive[:chords]
+#   },
+#   {
+#     track_name: 'bass1',
+#     octave_offset: -2,
+#     sequence: i_will_survive[:solo]
+#   }
+# )
+# Sound.new(samples: track.samples).play
