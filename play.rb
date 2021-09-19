@@ -11,7 +11,7 @@ beats = Beats.new
 # -------
 # You can play specific scales setting mode and octave for each one:
 #
-beats.play_scale('C', :major)
+# beats.play_scale('C', :minor)
 # beats.play_scale('G#', :major, octave: -1)
 # beats.play_scale('A', :major, octave: -1, number_of_notes: 49)
 # beats.play_scale('G#', :major, octave: 2)
@@ -22,57 +22,36 @@ beats.play_scale('C', :major)
 #
 # beats.play_chord('C.-1.minor', duration: 5)
 # beats.play_chords(%w[
-#   C.-1 A.-1.minor F.-1 G.-1 F.-1 D.-1.minor A.-1.minor
-#   C.-1 A.-1.minor F.-1 G.-1 F.-1 D.-1.minor A.-1.minor
+#   C.-1 Am.-1 F.-1 G.-1 F.-1 Dm.-1 Am.-1
+#   C.-1 Am.-1 F.-1 G.-1 F.-1 Dm.-1 Am.-1
 # ])
 
 
 # -------
-# You can mix different sound waves and play them together, mixing signals on time domain
+# You can mix different tracks and play them together, mixing signals on time domain
 #
-# beats.play_parallel(
-#   Note.build_many_for_scale('C', :major, octave: -1),
-#   Note.build_many_for_scale('E', :major, octave: -1),
-#   Note.build_many_for_scale('G', :major, octave: -1),
-#   [
-#     Note.new(letter: 'G', duration: 1),
-#     Note.new(letter: 'E', duration: 1),
-#     Note.new(letter: 'C', duration: 1)
-#   ]
-# )
-#
-# beats.save_parallel(
-#   Chord.build_many(%w[C.-2 A.-2.minor F.-2 G.-2 F.-2 D.-2.minor A.-2.minor], chord_duration: 0.8),
-#   Note.build_many(%w[C.1 A.1 F.1 G.1 F.1 D.1 A.1], note_duration: 0.8, release_size: 0.8),
-# )
-#
-# beats.play_parallel(
-#   Chord.build_many(%w[C.-2 A.-2.minor F.-2 G.-2 F.-2 D.-2.minor A.-2.minor], chord_duration: 0.8),
-#   Note.build_many(%w[C.1 A.1 F.1 G.1 F.1 D.1 A.1], note_duration: 0.8, release_size: 0.8),
-# )
-
 # i_will_survive = {
 #   chords: [
-#     { chord: 'A',  octave:  0, duration: 1.0, volume: 0.6, times: 2 },
-#     { chord: 'Dm', octave:  0, duration: 1.0, volume: 0.6, times: 2 },
-#     { chord: 'G',  octave: -1, duration: 1.0, volume: 0.6, times: 2 },
-#     { chord: 'Cm', octave:  0, duration: 1.0, volume: 0.6, times: 2 },
-#     { chord: 'F',  octave: -1, duration: 1.0, volume: 0.6, times: 2 },
-#     { chord: 'Bm', octave:  0, duration: 1.0, volume: 0.6, times: 2 },
-#     { chord: 'E',  octave: -1, duration: 1.0, volume: 0.6, times: 4 },
+#     { chord: 'A',  octave:  0, duration: 1.0, volume: 0.6, times: 4 },
+#     { chord: 'Dm', octave:  0, duration: 1.0, volume: 0.6, times: 4 },
+#     { chord: 'G',  octave: -1, duration: 1.0, volume: 0.6, times: 4 },
+#     { chord: 'Cm', octave:  0, duration: 1.0, volume: 0.6, times: 4 },
+#     { chord: 'F',  octave: -1, duration: 1.0, volume: 0.6, times: 4 },
+#     { chord: 'Bm', octave:  0, duration: 1.0, volume: 0.6, times: 4 },
+#     { chord: 'E',  octave: -1, duration: 1.0, volume: 0.6, times: 8 },
 #   ],
 #   solo: [
-#     { note: 'A', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
-#     { note: 'D', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
-#     { note: 'G', octave: -1, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
-#     { note: 'C', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
-#     { note: 'F', octave: -1, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
-#     { note: 'B', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 8 },
-#     { note: 'E', octave: -1, duration: 0.25, release_size: 0.8, volume: 0.9, times: 16 },
+#     { note: 'A', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 16 },
+#     { note: 'D', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 16 },
+#     { note: 'G', octave: -1, duration: 0.25, release_size: 0.8, volume: 0.9, times: 16 },
+#     { note: 'C', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 16 },
+#     { note: 'F', octave: -1, duration: 0.25, release_size: 0.8, volume: 0.9, times: 16 },
+#     { note: 'B', octave:  0, duration: 0.25, release_size: 0.8, volume: 0.9, times: 16 },
+#     { note: 'E', octave: -1, duration: 0.25, release_size: 0.8, volume: 0.9, times: 32 },
 #   ]
 # }
 
-# track = Track.build_from_encoded_tracks(
+# beats.play_tracks(
 #   {
 #     track_name: 'base1',
 #     octave_offset: -1,
@@ -89,4 +68,21 @@ beats.play_scale('C', :major)
 #     sequence: i_will_survive[:solo]
 #   }
 # )
-# Sound.new(samples: track.samples).play
+
+time_unit = 0.8
+beats.play_tracks(
+  {
+    track_name: 'test',
+    octave_offset: 0,
+    sequence: %w[A Bm D A A Bm D A A Bm D A].map do |chord|
+      [
+        { chord: chord,  octave:  0, duration: time_unit * 1.0, volume: 0.6, release_size: 0.9, times: 1 },
+        { chord: chord,  octave:  0, duration: time_unit * 0.5, volume: 0.6, release_size: 0.9, times: 1 },
+        { chord: chord,  octave:  0, duration: time_unit * 1.0, volume: 0.6, release_size: 0.9, times: 1 },
+        { chord: chord,  octave:  0, duration: time_unit * 0.5, volume: 0.6, release_size: 0.9, times: 1 },
+        { chord: chord,  octave:  0, duration: time_unit * 0.5, volume: 0.6, release_size: 0.9, times: 1 },
+        { chord: chord,  octave:  0, duration: time_unit * 0.5, volume: 0.6, release_size: 0.9, times: 1 },
+      ]
+    end.flatten
+  },
+)

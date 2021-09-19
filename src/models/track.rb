@@ -36,6 +36,7 @@ class Track < Sound
           duration: duration,
           volume: volume,
           times: times,
+          release_size: release_size
         )
       else
         Note.build_one(

@@ -57,7 +57,7 @@ class Scale < Sound
 
     # cut semitones to the asked `number_of_notes` 
     semitones[0..number_of_notes].map do |semitone|
-      octave = (semitone.to_f / 12).ceil
+      octave = (semitone.to_f / 12).floor
       note =  Note::LETTER_BY_SEMITONE[semitone % 12]
       Note.new(
         note: note,
@@ -66,9 +66,5 @@ class Scale < Sound
         volume: volume,
       )
     end
-  end
-
-  def self.build_sequence note, scale_type, number_of_notes: 8, octave: 0, note_duration: 0.5, volume: 0.5
-
   end
 end

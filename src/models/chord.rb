@@ -7,6 +7,8 @@ class Chord < Sound
   attr_accessor :octave
   attr_accessor :duration
   attr_accessor :volume
+  attr_accessor :times
+  attr_accessor :release_size
 
   NOTES_BY_CHORD_TYPE = {
     major: [0, 4, 7],
@@ -20,7 +22,8 @@ class Chord < Sound
     octave: 0,
     duration: 1.0,
     volume: 0.5,
-    times: 1
+    times: 1,
+    release_size: 0.10
   )
     @note = note
     @chord_type = chord_type
@@ -28,6 +31,7 @@ class Chord < Sound
     @duration = duration
     @volume = volume
     @times = times
+    @release_size = release_size || 0.10
   end
 
   def samples
@@ -42,16 +46,17 @@ class Chord < Sound
       print "#{note} "
       note = Note.new(
         note: note,
-        octave: @octave,
-        duration: @duration,
-        volume: @volume,
+        octave: octave,
+        duration: duration,
+        volume: volume,
+        release_size: release_size
       )
       note.samples
     end
     puts ''
 
     samples = Track.mix_samples(*sets_of_samples)
-    samples = @times.times.map { samples }.flatten if (@times > 1)
+    samples = times.times.map { samples }.flatten if (@times > 1)
     samples
   end
 
@@ -68,14 +73,16 @@ class Chord < Sound
     encoded_chords,
     chord_duration: 0.5,
     volume: 0.5,
-    octave_offset: 0
+    octave_offset: 0,
+    release_size: 0.10
   )
     encoded_chords.flatten.map do |encoded_chord|
       build_one(
         encoded_chord,
         duration: chord_duration,
         volume: volume,
-        octave_offset: octave_offset
+        octave_offset: octave_offset,
+        release_size: release_size
       )
     end
   end
@@ -85,13 +92,16 @@ class Chord < Sound
     duration: 0.5,
     volume: 0.5,
     times: 1,
-    octave_offset: 0
+    octave_offset: 0,
+    release_size: 0.10
   )
     chord_attrs = decode(encoded_chord, octave_offset.to_i).merge(
       duration: duration,
       volume: volume,
       times: times,
+      release_size: release_size
     )
+
     Chord.new(**chord_attrs)
   end
 
@@ -99,6 +109,17 @@ class Chord < Sound
     # decoded_chord example: { note: 'A', octave: 1, chord_type: 'minor' }
     note, octave, chord_type = decoded_chord.values_at(:note, :octave, :chord_type)
     "#{ note }.#{ octave + octave_offset }.#{ chord_type }"
+  end
+
+  def to_hash octave_offset = 0
+    {
+      chord: formatted_chord,
+      octave: octave.to_i + octave_offset,
+      chord_type: chord_type,
+      duration: duration,
+      volume: volume,
+      times: times,
+    }
   end
 
   def self.decode encoded_chord, octave_offset = 0
