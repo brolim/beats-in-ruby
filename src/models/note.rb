@@ -74,7 +74,7 @@ class Note < Sound
   end
 
   def attack i
-    n_samples_attack = 0.05 * SAMPLE_RATE * @duration
+    n_samples_attack = 0.13 * SAMPLE_RATE * @duration
     attack_step = 1.0 / n_samples_attack
     [1.0, i * attack_step].min
   end

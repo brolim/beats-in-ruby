@@ -6,7 +6,7 @@ class Sound
 
   OUTPUTS_FOLDER = 'outputs'
 
-  def initialize samples:, output_name: 'output'
+  def initialize samples:, output_name: 'output2'
     @samples = samples
     @output_name = output_name
   end
@@ -18,11 +18,13 @@ class Sound
         file.write([sample].pack('e')) # write float32bitsLE into file
       end
     end
-    system "ffplay -showmode 1 -f f32le -ar #{ Note::SAMPLE_RATE } #{ file_name }"
+    system "ffplay -autoexit -showmode 1 -f f32le -ar #{ Note::SAMPLE_RATE } #{ file_name }"
   end
 
   def save!
-    Writer.new("#{ OUTPUTS_FOLDER }/#{@output_name}.wav", Format.new(:mono, :pcm_32, Note::SAMPLE_RATE)) do |writer|
+    puts 'aaaa'
+    sss = samples
+    Writer.new("#{ OUTPUTS_FOLDER }/#{@output_name}-wave-file.wav", Format.new(:mono, :pcm_32, Note::SAMPLE_RATE)) do |writer|
       writer.write(
         Buffer.new(
           samples,
@@ -30,5 +32,8 @@ class Sound
         )
       )
     end
+    puts sss.size
+    puts @output_name
+    puts 'bbbb'
   end
 end
