@@ -98,113 +98,150 @@ def build_chord_with_rythm chord, time_unit
   ]
 end
 
+def music_to_tracks music
+  lines = music.split("\n").map do |line|
+    next if line.strip.empty?
+    line.strip
+  end
+
+  chuncks = {}
+  number_of_tracks = nil
+  current_chunk = nil
+
+  lines.compact.each do |line_with_content|
+    if line_with_content.start_with?('@tracks:')
+      current_chunk, number_of_tracks = line_with_content.split(':')
+      number_of_tracks = number_of_tracks.to_i
+      chuncks[current_chunk] = number_of_tracks.to_i
+      next
+    end
+
+    if line_with_content.start_with?('@repeat:')
+      current_chunk = "@#{line_with_content.split(':').last.strip}"
+      chuncks[line_with_content] = chuncks[current_chunk]
+      next
+    end
+
+    if line_with_content.start_with?('@')
+      current_chunk = line_with_content
+      chuncks[current_chunk] = []
+      next
+    end
+
+    chuncks[current_chunk] << line_with_content
+  end
+
+  tracks = []
+  number_of_tracks.times { tracks << [] }
+
+  chuncks.each do |key, value|
+    if value.is_a?(Array)
+      value.each_with_index do |chunk, index|
+        tracks[index % number_of_tracks] +=
+          chunk
+            .gsub(/\s+/, ' ')
+            .strip
+            .split(' ')
+      end
+    end
+  end
+
+  tracks
+end
+
 time_unit = 0.42
 chord_time = time_unit * 4
 
-verse = [
- # G
-  '_   _   _   B',
+tracks = music_to_tracks("""
+  @tracks:2
 
- # G       G
-  'D D D D E D B G.-1',
+  @verse
 
- # B m     Bm
-  'B D D D E D B G.-1',
+  C  D  G  Em
+  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
- # G       Em
-  'D D D D E D C B',
 
- # D       D
-  'D _ _ _ _ _ _ A',
+  C  D  G  G
+  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ B
 
- # C       D
-  'C C C C B A A G.-1',
 
- # G       Em
-  'B B B B A G.-1 G.-1 G.-1',
+  G       G
+  D D D D E D B G.-1
 
- # C       D
-  'C C C B A A G.-1 F#.-1',
 
- # G
-  'G.-1 _  _  _',
-]
+  Bm      Bm
+  B D D D E D B G.-1
 
-chorus = [
- # G          C
-  '_ G.-1 A B C C B A',
 
- # D                  G
-  'F#.-1 F#.-1 E.-1 D.-1 B D.-1 B G.-1',
+  G       Em
+  D D D D E D C B
 
- # Em                  C
-  'E.-1 E.-1 E.-1 D.-1 C _ _ B',
 
- # D                  G
-  'F#.-1 F#.-1 E.-1 D.-1 B _ _ _',
-]
+  D       D
+  D _ _ _ _ _ _ A
 
-voice_for_cowboy_fora_da_lei = [
-  '_ _ _ _',
-  '_ _ _ _',
-  '_ _ _ _',
-  '_ _ _ _',
-  '_ _ _ _',
-  '_ _ _ _',
-  '_ _ _ _',
-] + verse + verse + [
-  '_ _ _ _',
-] + chorus + chorus
 
-voice_for_cowboy_fora_da_lei =
-  voice_for_cowboy_fora_da_lei
-    .flatten
-    .join(' ')
-    .split(' ')
+  C       D
+  C C C C B A A G.-1
+
+
+  G       Em
+  B B B B A G.-1 G.-1 G.-1
+
+
+  C       D
+  C C C B A A G.-1 F#.-1
+
+
+  G
+  G.-1 _  _  _
+
+  @repeat:verse
+
+  @chorus
+
+  G          C
+  _ G.-1 A B C C B A
+
+
+  D                  G
+  F#.-1 F#.-1 E.-1 D.-1 B D.-1 B G.-1
+
+
+  Em                  C
+  E.-1 E.-1 E.-1 D.-1 C _ _ B
+
+
+  D                  G
+  F#.-1 F#.-1 E.-1 D.-1 B _ _ _
+
+
+  @repeat:chorus
+""")
+
+base_sequence = tracks[0].map { |chord| build_chord_with_rythm(chord, time_unit) }.flatten
+base_sequence << {
+  chord: 'G',
+  octave:  0,
+  duration: 1.00 * time_unit,
+  volume: 0.8,
+  release_size: 0.92,
+  times: 1
+}
+
+voice_sequence = tracks[1].map do |encoded_note|
+  note, octave = encoded_note.split('.')
+  {
+    note: note,
+    octave:  octave.to_i,
+    duration: 1.00 * time_unit,
+    volume: 0.4,
+    release_size: 0.92,
+    times: 1
+  }
+end
 
 beats.play_tracks(
-  {
-    track_name: 'base',
-    octave_offset: -1,
-    sequence: %w[
-      C  D  G  Em
-      C  D  G  G
-
-      G  G  Bm Bm
-      G  Em D  D
-      C  D  G  Em
-      C  D  G  G
-
-      G  G  Bm Bm
-      G  Em D  D
-      C  D  G  Em
-      C  D  G  G
-
-      G  C  D  G
-      Em C  D  G
-
-      G  C  D  G
-      Em C  D  G
-
-      C  D  G  G
-    ].map { |chord| build_chord_with_rythm(chord, time_unit) }.flatten + [
-      { chord: 'G',  octave:  0, duration: 1.00 * time_unit, volume: 0.8, release_size: 0.92, times: 1 },
-    ]
-  },
-  {
-    track_name: 'voice1',
-    sequence: voice_for_cowboy_fora_da_lei.map do |encoded_note|
-      note, octave = encoded_note.split('.')
-      {
-        note: note,
-        octave:  octave.to_i,
-        duration: 1.00 * time_unit,
-        volume: 0.4,
-        release_size: 0.92,
-        times: 1
-      }
-    end
-  },
+  { track_name: 'base',   sequence: base_sequence, octave_offset: -1 },
+  { track_name: 'voice', sequence: voice_sequence },
 )
-
-
